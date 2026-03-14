@@ -110,23 +110,51 @@ The dataset is published by the **UK Land Registry** and contains large-scale re
 
 ---
 
-# 📊 Model Performance
+## 📊 Model Performance
 
-Models were evaluated using:
+Several regression models were trained and evaluated using MAE, MSE, RMSE, R² Score, and cross-validation.
 
-- Mean Absolute Error (MAE)
-- Mean Squared Error (MSE)
-- R² Score
+| Model | MAE | RMSE | R² Score | CV Mean R² |
+|------|------:|------:|------:|------:|
+| Linear Regression | 84,794 | 188,497 | **0.236** | **0.121** |
+| Decision Tree | 66,669 | 279,974 | -0.685 | -0.046 |
+| Gradient Boosting | 69,202 | 291,150 | -0.823 | -0.100 |
+| Random Forest (Tuned) | 64,146 | 239,588 | -0.234 | 0.073 |
 
-| Model | MAE | MSE | R² Score |
-|------|------|------|------|
-| Linear Regression | 91,068 | 142,631,236,181 | 0.053 |
-| Decision Tree | 57,652 | 115,362,589,796 | 0.234 |
-| Random Forest | 70,907 | 116,200,468,714 | 0.228 |
+**Linear Regression achieved the best overall performance and was selected as the final deployed model.**
 
-Although the **Decision Tree** achieved slightly better metrics, the **Random Forest Regressor** was selected for deployment because ensemble methods typically provide more stable predictions and better generalization.
+Although tree-based models produced lower MAE in some cases, their negative R² scores indicate weaker overall fit and poor generalization on this dataset.
 
-Random Forest reduces overfitting by averaging predictions from multiple decision trees.
+The dataset mainly contains transaction metadata such as:
+
+- property type  
+- ownership duration  
+- location (town, district, county)  
+- transaction year  
+
+but lacks important property attributes like:
+
+- bedrooms  
+- floor area  
+- bathrooms  
+- property condition  
+
+Because of this, simpler linear relationships performed better than more complex non-linear models.
+
+---
+
+## ⚙️ Model Optimization
+
+Hyperparameter tuning was performed using **RandomizedSearchCV** for the Random Forest model.
+
+This automated search evaluated multiple parameter combinations including:
+
+- number of trees
+- maximum depth
+- minimum samples per split
+- minimum samples per leaf
+
+Although tuning improved model stability, Linear Regression still produced the highest R² score and was therefore selected for deployment.
 
 ---
 

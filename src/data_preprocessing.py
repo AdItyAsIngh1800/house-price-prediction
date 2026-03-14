@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 
 
 def preprocess_data(file_path: str):
@@ -7,12 +6,17 @@ def preprocess_data(file_path: str):
 
     data["Date of Transfer"] = pd.to_datetime(data["Date of Transfer"])
     data["Year"] = data["Date of Transfer"].dt.year
+    data["Month"] = data["Date of Transfer"].dt.month
+    data["Quarter"] = data["Date of Transfer"].dt.quarter
 
-    data = data.drop(columns=[
-        "Transaction unique identifier",
-        "PPDCategory Type",
-        "Record Status - monthly file only"
-    ])
+    data = data.drop(
+        columns=[
+            "Transaction unique identifier",
+            "PPDCategory Type",
+            "Record Status - monthly file only",
+        ],
+        errors="ignore",
+    )
 
     data = data.dropna()
     data = data[data["Price"] > 1000]
@@ -23,32 +27,14 @@ def preprocess_data(file_path: str):
         "Duration",
         "Town/City",
         "District",
-        "County"
+        "County",
     ]
 
     for col in categorical_columns:
         data[col] = data[col].astype(str).str.strip()
 
-    property_type_encoder = LabelEncoder()
-    old_new_encoder = LabelEncoder()
-    duration_encoder = LabelEncoder()
-    town_city_encoder = LabelEncoder()
-    district_encoder = LabelEncoder()
-    county_encoder = LabelEncoder()
+    data["district_avg_price"] = data.groupby("District")["Price"].transform("mean")
+    data["county_avg_price"] = data.groupby("County")["Price"].transform("mean")
+    data["town_avg_price"] = data.groupby("Town/City")["Price"].transform("mean")
 
-    data["Property Type"] = property_type_encoder.fit_transform(data["Property Type"])
-    data["Old/New"] = old_new_encoder.fit_transform(data["Old/New"])
-    data["Duration"] = duration_encoder.fit_transform(data["Duration"])
-    data["Town/City"] = town_city_encoder.fit_transform(data["Town/City"])
-    data["District"] = district_encoder.fit_transform(data["District"])
-    data["County"] = county_encoder.fit_transform(data["County"])
-
-    return (
-        data,
-        property_type_encoder,
-        old_new_encoder,
-        duration_encoder,
-        town_city_encoder,
-        district_encoder,
-        county_encoder,
-    )
+    return data
