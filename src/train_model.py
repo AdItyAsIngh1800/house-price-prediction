@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import cast
 
 import joblib
+import mlflow
+from mlflow import sklearn as mlflow_sklearn
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
@@ -32,14 +34,16 @@ def evaluate_model(name, pipeline, X_train, X_test, y_train, y_test):
         scoring="r2"
     )
 
-    return {
+    metrics = {
         "Model": name,
         "MAE": mae,
         "MSE": mse,
         "RMSE": rmse,
         "R2 Score": r2,
         "CV Mean R2": cv_scores.mean()
-    }, pipeline
+    }
+
+    return metrics, pipeline
 
 
 def main():
@@ -48,9 +52,15 @@ def main():
     models_dir = base_dir / "models"
     models_dir.mkdir(exist_ok=True)
 
+    # MLflow setup
+    mlflow.set_tracking_uri("file:" + str((base_dir / "mlruns").resolve()))
+    mlflow.set_experiment("House Price Prediction")
+
+    # Autolog sklearn params / metrics / model
+    mlflow_sklearn.autolog(log_input_examples=False, log_model_signatures=True)
+
     data = preprocess_data(str(data_path))
 
-    # Keep training lighter for local runs
     if len(data) > 50000:
         data = data.sample(n=50000, random_state=42)
 
@@ -68,8 +78,6 @@ def main():
         "county_avg_price",
         "town_avg_price",
     ]
-
-    print("Available columns:", data.columns.tolist())
 
     X = data[feature_columns]
     y = data["Price"]
@@ -95,6 +103,7 @@ def main():
         "county_avg_price",
         "town_avg_price",
     ]
+    X[numeric_features] = X[numeric_features].astype("float64")
 
     preprocessor = ColumnTransformer(
         transformers=[
@@ -129,14 +138,25 @@ def main():
             ("model", model),
         ])
 
-        metrics, trained_pipeline = evaluate_model(
-            name, pipeline, X_train, X_test, y_train, y_test
-        )
-        results.append(metrics)
+        with mlflow.start_run(run_name=name):
+            metrics, trained_pipeline = evaluate_model(
+                name, pipeline, X_train, X_test, y_train, y_test
+            )
 
-        if metrics["R2 Score"] > best_r2:
-            best_r2 = metrics["R2 Score"]
-            best_pipeline = trained_pipeline
+            mlflow.set_tag("model_family", name)
+            mlflow.log_metric("custom_mae", metrics["MAE"])
+            mlflow.log_metric("custom_mse", metrics["MSE"])
+            mlflow.log_metric("custom_rmse", metrics["RMSE"])
+            mlflow.log_metric("custom_r2", metrics["R2 Score"])
+            mlflow.log_metric("custom_cv_mean_r2", metrics["CV Mean R2"])
+            mlflow.log_param("train_rows", len(X_train))
+            mlflow.log_param("test_rows", len(X_test))
+
+            results.append(metrics)
+
+            if metrics["R2 Score"] > best_r2:
+                best_r2 = metrics["R2 Score"]
+                best_pipeline = trained_pipeline
 
     print("\nRunning Random Forest hyperparameter tuning...")
 
@@ -163,40 +183,52 @@ def main():
         verbose=1
     )
 
-    rf_search.fit(X_train, y_train)
+    with mlflow.start_run(run_name="Random Forest Tuned"):
+        rf_search.fit(X_train, y_train)
 
-    best_rf = cast(Pipeline, rf_search.best_estimator_)
-    rf_predictions = best_rf.predict(X_test)
+        best_rf = cast(Pipeline, rf_search.best_estimator_)
+        rf_predictions = best_rf.predict(X_test)
 
-    rf_mae = mean_absolute_error(y_test, rf_predictions)
-    rf_mse = mean_squared_error(y_test, rf_predictions)
-    rf_rmse = rf_mse ** 0.5
-    rf_r2 = r2_score(y_test, rf_predictions)
+        rf_mae = mean_absolute_error(y_test, rf_predictions)
+        rf_mse = mean_squared_error(y_test, rf_predictions)
+        rf_rmse = rf_mse ** 0.5
+        rf_r2 = r2_score(y_test, rf_predictions)
 
-    results.append({
-        "Model": "Random Forest Tuned",
-        "MAE": rf_mae,
-        "MSE": rf_mse,
-        "RMSE": rf_rmse,
-        "R2 Score": rf_r2,
-        "CV Mean R2": rf_search.best_score_
-    })
+        tuned_metrics = {
+            "Model": "Random Forest Tuned",
+            "MAE": rf_mae,
+            "MSE": rf_mse,
+            "RMSE": rf_rmse,
+            "R2 Score": rf_r2,
+            "CV Mean R2": rf_search.best_score_
+        }
 
-    if rf_r2 > best_r2:
-        best_r2 = rf_r2
-        best_pipeline = best_rf
+        mlflow.set_tag("model_family", "Random Forest Tuned")
+        mlflow.log_metric("custom_mae", tuned_metrics["MAE"])
+        mlflow.log_metric("custom_mse", tuned_metrics["MSE"])
+        mlflow.log_metric("custom_rmse", tuned_metrics["RMSE"])
+        mlflow.log_metric("custom_r2", tuned_metrics["R2 Score"])
+        mlflow.log_metric("custom_cv_mean_r2", tuned_metrics["CV Mean R2"])
+
+        # Log best tuned params explicitly
+        for k, v in rf_search.best_params_.items():
+            mlflow.log_param(k, v)
+
+        results.append(tuned_metrics)
+
+        if rf_r2 > best_r2:
+            best_r2 = rf_r2
+            best_pipeline = best_rf
 
     results_df = pd.DataFrame(results)
     print("\nModel Comparison:")
     print(results_df)
 
-    print("\nBest Random Forest Parameters:")
-    print(rf_search.best_params_)
-
     results_df.to_csv(models_dir / "model_metrics.csv", index=False)
     joblib.dump(best_pipeline, models_dir / "house_price_pipeline.pkl")
 
     print("\nBest pipeline saved as: models/house_price_pipeline.pkl")
+    print("MLflow tracking saved under: mlruns/")
 
 
 if __name__ == "__main__":
