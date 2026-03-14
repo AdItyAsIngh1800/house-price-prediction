@@ -1,0 +1,19 @@
+# Large data / generated files
+data/price_paid_records.csv
+house_predictions.db
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual env
+.venv/
+venv/
+
+models/*.pkl
