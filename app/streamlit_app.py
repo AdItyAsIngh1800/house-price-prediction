@@ -99,7 +99,7 @@ st.write("""
 # Dataset preview
 # -----------------------------
 with st.expander("View Sample Dataset"):
-    st.dataframe(data.head(10))
+    st.dataframe(data.head(10), use_container_width=True)
 
 # -----------------------------
 # User Input
@@ -189,7 +189,7 @@ if st.button("Predict Price"):
             "County": [county],
             "Year": [year],
         })
-        st.dataframe(display_df)
+        st.dataframe(display_df, use_container_width=True)
 
     except requests.exceptions.ConnectionError:
         st.error("Could not connect to FastAPI backend. Start the API with: uvicorn api.main:app --reload")
@@ -207,6 +207,8 @@ if st.button("Predict Price"):
 # -----------------------------
 st.markdown("## Prediction History")
 
+history_df = pd.DataFrame()
+
 if st.button("Load Recent Predictions"):
     try:
         response = requests.get(f"{API_BASE_URL}/predictions", timeout=10)
@@ -215,7 +217,7 @@ if st.button("Load Recent Predictions"):
 
         if history:
             history_df = pd.DataFrame(history)
-            st.dataframe(history_df)
+            st.dataframe(history_df, use_container_width=True)
         else:
             st.info("No predictions found in the database yet.")
 
@@ -223,6 +225,51 @@ if st.button("Load Recent Predictions"):
         st.error("Could not connect to FastAPI backend. Start the API with: uvicorn api.main:app --reload")
     except Exception as e:
         st.error(f"Could not load prediction history: {str(e)}")
+
+# -----------------------------
+# Model Monitoring
+# -----------------------------
+st.markdown("## 📊 Model Monitoring Metrics")
+
+try:
+    response = requests.get(f"{API_BASE_URL}/monitoring", timeout=10)
+    response.raise_for_status()
+    metrics = response.json()
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric("Total Predictions", metrics["total_predictions"])
+    col2.metric("Average Price", f"£{metrics['average_price']:,.0f}")
+    col3.metric("Highest Price", f"£{metrics['max_price']:,.0f}")
+    col4.metric("Lowest Price", f"£{metrics['min_price']:,.0f}")
+
+except Exception as e:
+    st.error(f"Could not load monitoring metrics: {str(e)}")
+
+# -----------------------------
+# Prediction Distribution
+# -----------------------------
+st.markdown("### Prediction Price Distribution")
+
+try:
+    response = requests.get(f"{API_BASE_URL}/predictions", timeout=10)
+    response.raise_for_status()
+    history = response.json().get("predictions", [])
+
+    if history:
+        history_df = pd.DataFrame(history)
+
+        if "predicted_price" in history_df.columns:
+            distribution_df = history_df[["predicted_price"]].copy()
+            distribution_df.index = pd.Index(range(1, len(distribution_df) + 1))
+            st.bar_chart(distribution_df)
+        else:
+            st.info("Prediction data is available, but no predicted_price column was found.")
+    else:
+        st.info("No prediction records available yet for distribution chart.")
+
+except Exception as e:
+    st.error(f"Could not load prediction distribution: {str(e)}")
 
 # -----------------------------
 # Dataset insights
@@ -355,4 +402,5 @@ This project demonstrates:
 - Docker containerization
 - Location-based analytics
 - Basic model interpretability
+- Model monitoring metrics
 """)

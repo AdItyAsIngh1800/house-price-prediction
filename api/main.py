@@ -162,6 +162,32 @@ def predict_price(request: PredictionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/monitoring")
+def monitoring_metrics():
+    conn = sqlite3.connect(DB_PATH)
+
+    df = pd.read_sql_query("SELECT * FROM predictions", conn)
+
+    conn.close()
+
+    if df.empty:
+        return {
+            "total_predictions": 0,
+            "average_price": 0,
+            "max_price": 0,
+            "min_price": 0
+        }
+
+    metrics = {
+        "total_predictions": int(len(df)),
+        "average_price": float(df["predicted_price"].mean()),
+        "max_price": float(df["predicted_price"].max()),
+        "min_price": float(df["predicted_price"].min())
+    }
+
+    return metrics
+
+
 # -----------------------------
 # Prediction History
 # -----------------------------
@@ -172,3 +198,5 @@ def get_predictions():
     conn.close()
 
     return {"predictions": df.to_dict(orient="records")}
+
+
