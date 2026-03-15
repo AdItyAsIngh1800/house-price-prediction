@@ -5,7 +5,8 @@ import sqlite3
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+
+from api.schemas import PredictionRequest, PredictionResponse
 
 # -----------------------------
 # Paths
@@ -47,25 +48,12 @@ for col in ["Property Type", "Old/New", "Duration", "Town/City", "District", "Co
 district_price_map = reference_data.groupby("District")["Price"].mean().to_dict()
 county_price_map = reference_data.groupby("County")["Price"].mean().to_dict()
 town_price_map = reference_data.groupby("Town/City")["Price"].mean().to_dict()
-
 global_avg_price = float(reference_data["Price"].mean())
 
 # -----------------------------
 # FastAPI app
 # -----------------------------
 app = FastAPI(title="House Price Prediction API")
-
-# -----------------------------
-# Request Schema
-# -----------------------------
-class PredictionRequest(BaseModel):
-    property_type: str
-    old_new: str
-    duration: str
-    town_city: str
-    district: str
-    county: str
-    year: int
 
 # -----------------------------
 # Initialize SQLite DB
@@ -94,6 +82,7 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 init_db()
 
 # -----------------------------
@@ -106,7 +95,7 @@ def root():
 # -----------------------------
 # Prediction Endpoint
 # -----------------------------
-@app.post("/predict")
+@app.post("/predict", response_model=PredictionResponse)
 def predict_price(request: PredictionRequest):
     try:
         month = 1
@@ -168,7 +157,7 @@ def predict_price(request: PredictionRequest):
         conn.commit()
         conn.close()
 
-        return {"predicted_price": predicted_price}
+        return PredictionResponse(predicted_price=predicted_price)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
