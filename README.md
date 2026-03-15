@@ -1,18 +1,25 @@
 # **🏠 House Price Prediction System**
 
-  
-
 Machine Learning & Full-Stack Deployment Project
-
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
+
+  
 
 ![MLflow](https://img.shields.io/badge/MLflow-0194E2?style=flat&logo=mlflow&logoColor=white)
 
+  
+
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
+
+  
 
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
 
+  
+
 ![Docker](https://img.shields.io/badge/Docker-Container-blue)
+
+  
 
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
@@ -38,12 +45,14 @@ The system integrates:
     
 -   Database logging of predictions
     
--   Containerized deployment using Docker
+-   Experiment tracking with  **MLflow**
+    
+-   Containerized deployment using  **Docker**
     
 
   
 
-The project demonstrates an **end-to-end ML workflow from data preprocessing to deployment.**
+The project demonstrates a **complete end-to-end ML workflow from data preprocessing to production-style deployment.**
 
 ----------
 
@@ -69,11 +78,13 @@ The project demonstrates an **end-to-end ML workflow from data preprocessing to 
 
 ✔ Docker containerization for reproducible deployment
 
-✔ Location-based price analysis dashboard  
+✔ Location-based price analysis dashboard
 
-✔ Model feature importance visualization  
+✔ Model feature importance visualization
 
-✔ MLflow experiment tracking for model training
+✔ **MLflow experiment tracking**
+
+✔ **Prediction monitoring metrics**
 
 ----------
 
@@ -83,8 +94,9 @@ The project demonstrates an **end-to-end ML workflow from data preprocessing to 
 
 ## **Programming Language**
 
--   Python
-    
+  
+
+Python
 
   
 
@@ -111,6 +123,13 @@ The project demonstrates an **end-to-end ML workflow from data preprocessing to 
 ## **Frontend Dashboard**
 
 -   Streamlit
+    
+
+  
+
+## **Experiment Tracking**
+
+-   MLflow
     
 
   
@@ -147,15 +166,17 @@ The machine learning workflow followed in this project:
     
 5.  Evaluate model performance
     
-6.  Select model for deployment
+6.  Log experiments to  **MLflow**
     
-7.  Deploy prediction API using FastAPI
+7.  Select best performing model
     
-8.  Build interactive UI using Streamlit
+8.  Deploy prediction API using FastAPI
     
-9.  Log predictions to SQLite database
+9.  Build interactive UI using Streamlit
     
-10.  Containerize the system using Docker
+10.  Log predictions to SQLite database
+    
+11.  Containerize system using Docker
     
 
 ----------
@@ -193,84 +214,73 @@ The dataset is published by the  **UK Land Registry**  and contains large-scale 
 
 ----------
 
-## 📍 Location Insights
+# **📍 Location Insights**
 
-The Streamlit dashboard includes location-based analytics that allow users to explore regional housing trends.
+  
+
+The Streamlit dashboard includes  **location-based analytics**  that allow users to explore regional housing trends.
+
+  
 
 The dashboard displays:
 
-- Top 10 most expensive towns and cities
-- Top 10 most affordable towns and cities
-- Average house prices by county
-- Average house prices by district
-- Detailed county-level analysis
+-   Top 10 most expensive towns and cities
+    
+-   Top 10 most affordable towns and cities
+    
+-   Average house prices by county
+    
+-   Average house prices by district
+    
+-   Detailed county-level analysis
+    
 
-These insights help users understand regional price variations in the housing market.
+  
 
----
+These insights help users understand **regional price variations in the housing market.**
 
-## **📊 Model Performance**
+----------
 
-Several regression models were trained and evaluated using MAE, MSE, RMSE, R² Score, and cross-validation.
+# **📊 Model Performance**
 
-## 📊 Model Performance Comparison
+  
 
-| Model | MAE | MSE | RMSE | R2 Score | CV Mean R2 |
-|------|------|------|------|------|------|
-| Linear Regression | 84793.5665 | 35531128923 | 188497.0263 | 0.2360559754 | 0.1205277606 |
-| Decision Tree | 66668.81589 | 78385657903 | 279974.3879 | -0.6853462522 | -0.04580773359 |
-| Gradient Boosting | 69202.06955 | 84768597990 | 291150.4731 | -0.8225839107 | -0.1003212652 |
-| Random Forest Tuned | 64146.22748 | 57402220388 | 239587.6048 | -0.2341877275 | 0.07344626178 |
+Several regression models were trained and evaluated using  **MAE, MSE, RMSE, R² Score, and cross-validation**.
+
+## Model Performance Comparison
+
+| Model                 | MAE        | MSE         | RMSE        | R2 Score     | CV Mean R2   |
+|----------------------|-----------|------------|------------|-------------|-------------|
+| Linear Regression     | 84793.5665 | 35531128923 | 188497.0263 | 0.2360559754 | 0.1205277606 |
+| Decision Tree         | 66668.81589 | 78385657903 | 279974.3879 | -0.6853462522 | -0.04580773359 |
+| Gradient Boosting     | 69202.06955 | 84768597990 | 291150.4731 | -0.8225839107 | -0.1003212652 |
+| Random Forest Tuned   | 64146.22748 | 57402220388 | 239587.6048 | -0.2341877275 | 0.07344626178 |
 
 **Linear Regression achieved the best overall performance and was selected as the final deployed model.**
 
   
 
-Although tree-based models produced lower MAE in some cases, their negative R² scores indicate weaker overall fit and poor generalization on this dataset.
-
-  
-
-The dataset mainly contains transaction metadata such as:
-
--   property type
-    
--   ownership duration
-    
--   location (town, district, county)
-    
--   transaction year
-    
-
-  
-
-but lacks important property attributes like:
-
--   bedrooms
-    
--   floor area
-    
--   bathrooms
-    
--   property condition
-    
-
-  
-
-Because of this, simpler linear relationships performed better than more complex non-linear models.
+Although tree-based models produced lower MAE in some cases, their  **negative R² scores indicate weaker overall fit and poor generalization**  on this dataset.
 
 ----------
 
-## 🔎 Model Interpretability
+# **🔎 Model Interpretability**
 
-The dashboard includes a **feature importance visualization** that highlights which variables influence house price predictions.
+  
+
+The dashboard includes a  **feature importance visualization**  that highlights which variables influence house price predictions.
+
+  
 
 For tree-based models (Decision Tree, Random Forest, Gradient Boosting), feature importance values are extracted during training and displayed in the Streamlit dashboard.
 
+  
+
 This improves transparency and helps understand how the model makes predictions.
 
----
+----------
 
-## **⚙️ Model Optimization**
+# **⚙️ Model Optimization**
 
   
 
@@ -278,7 +288,7 @@ Hyperparameter tuning was performed using  **RandomizedSearchCV**  for the Rando
 
   
 
-This automated search evaluated multiple parameter combinations including:
+Parameters explored include:
 
 -   number of trees
     
@@ -291,47 +301,84 @@ This automated search evaluated multiple parameter combinations including:
 
   
 
-Although tuning improved model stability, Linear Regression still produced the highest R² score and was therefore selected for deployment.
+Although tuning improved model stability, **Linear Regression still produced the highest R² score and was therefore selected for deployment.**
 
 ----------
 
-## 🧪 Experiment Tracking
+# **🧪 Experiment Tracking**
 
-Model training experiments are tracked using **MLflow**.
+  
+
+Model training experiments are tracked using  **MLflow**.
+
+  
 
 MLflow automatically records:
 
-- model parameters
-- evaluation metrics
-- cross-validation results
-- trained model artifacts
+-   model parameters
+    
+-   evaluation metrics
+    
+-   cross-validation results
+    
+-   trained model artifacts
+    
 
-Each training run is logged as an experiment, allowing easy comparison between models such as:
+  
 
-- Linear Regression
-- Decision Tree
-- Gradient Boosting
-- Random Forest
+Each training run is logged as an experiment, allowing easy comparison between models.
 
-MLflow improves reproducibility and experiment management during model development.
+  
 
----
+Open MLflow dashboard:
+
+```
+http://localhost:5001
+```
+
+----------
+
+# **📊 Model Monitoring**
+
+  
+
+The backend API exposes  **model monitoring metrics**  including:
+
+-   total predictions
+    
+-   average predicted price
+    
+-   highest predicted price
+    
+-   lowest predicted price
+    
+
+  
+
+These metrics are displayed in the Streamlit dashboard to monitor model usage.
+
+----------
 
 # **🏗 System Architecture**
 
 ```mermaid
 flowchart LR
 
-subgraph Frontend
+subgraph User Layer
 U[User]
-S[Streamlit App]
+end
+
+subgraph Frontend
+S[Streamlit Dashboard]
 end
 
 subgraph Backend
 A[FastAPI API]
+V[Input Validation]
+M[Monitoring Endpoint]
 end
 
-subgraph ML
+subgraph ML System
 P[ML Pipeline<br/>Encoder + Model]
 end
 
@@ -339,19 +386,27 @@ subgraph Storage
 D[(SQLite Database)]
 end
 
-subgraph Training
-C[CSV Dataset]
-P2[Preprocessing]
-T[Training & Evaluation]
+subgraph Training Pipeline
+C[Housing Dataset CSV]
+PP[Data Preprocessing]
+T[Model Training]
+E[Model Evaluation]
+MLF[MLflow Tracking]
 end
 
 U --> S
-S -->|Send input| A
-A --> P
-A -->|Log prediction| D
-A -->|Return predicted price| S
+S -->|Send Input| A
+A --> V
+V --> P
+P --> A
 
-C --> P2 --> T --> P
+A -->|Prediction Result| S
+A -->|Log Prediction| D
+A --> M
+
+C --> PP --> T --> E
+E --> MLF
+E --> P
 ```
 
 ----------
@@ -359,45 +414,46 @@ C --> P2 --> T --> P
 # **📂 Project Structure**
 
 ```
-house-price-prediction/
-├── Dockerfile
-├── LICENSE
-├── README.md
+house-price-prediction
+│
+├── api
+│   ├── main.py
+│   ├── schemas.py
+│   └── monitoring.py
+│
+├── app
+│   └── streamlit_app.py
+│
+├── src
+│   ├── train_model.py
+│   ├── data_preprocessing.py
+│   └── predict.py
+│
+├── data
+│   └── price_paid_records.csv
+│
+├── database
+│   └── db.py
+│
+├── models
+│   ├── house_price_pipeline.pkl
+│   ├── model_metrics.csv
+│   └── feature_importance.csv
+│
+├── notebooks
+│   └── house_price_prediction.ipynb
+│
 ├── Screenshots
 │   ├── fastapi_docs.png
 │   └── streamlit_ui.png
-├── api
-│   ├── main.py
-│   └── schemas.py
-├── app
-│   └── streamlit_app.py
-├── data
-│   ├── dataset_sample.md
-│   ├── extract_metadata.ipynb
-│   └── price_paid_records.csv
-├── database
-│   └── db.py
-├── docker-compose.yml
-├── house_predictions.db
-├── models
-│   ├── county_encoder.pkl
-│   ├── district_encoder.pkl
-│   ├── duration_encoder.pkl
-│   ├── house_price_model.pkl
-│   ├── house_price_pipeline.pkl
-│   ├── model_metrics.csv
-│   ├── old_new_encoder.pkl
-│   ├── property_type_encoder.pkl
-│   └── town_city_encoder.pkl
-├── notebooks
-│   └── house_price_prediction.ipynb
-├── requirements.txt
-├── mlruns/  
+│
+├── mlruns
 ├── mlflow.db
-└── src
-    ├── data_preprocessing.py
-    ├── predict.py
-    └── train_model.py
+│
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
 
 ----------
@@ -407,51 +463,60 @@ house-price-prediction/
   
 
 ## **Streamlit Interface**
+
 ![Streamlit UI](Screenshots/streamlit_ui.png)
 
 ## **FastAPI Swagger Documentation**
-![FastAPI Docs](Screenshots/fastapi_docs.png)
 
+
+![FastAPI Docs](Screenshots/fastapi_docs.png)
 ----------
 
 # **🚀 Running the Project Locally**
 
   
 
-## **1️⃣ Clone repository**
+### **1️⃣ Clone repository**
 
 ```
 git clone https://github.com/AdItyAsIngh1800/house-price-prediction.git
 cd house-price-prediction
 ```
 
-2️⃣ Install dependencies
+----------
+
+### **2️⃣ Install dependencies**
 
 ```
 pip install -r requirements.txt
 ```
 
 ----------
-### Run MLflow UI
 
-After training models, you can inspect experiment results using MLflow.
+### **Run MLflow**
 
-Start the MLflow tracking server:
-
-```bash
-mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --port 5000
 ```
-Open the MLflow dashboard:
-http://localhost:5000
+mlflow server \
+--backend-store-uri sqlite:///mlflow.db \
+--default-artifact-root ./mlruns \
+--port 5001
+```
 
----
-3️⃣ Start FastAPI server
+Open:
+
+```
+http://localhost:5001
+```
+
+----------
+
+### **3️⃣ Start FastAPI**
 
 ```
 uvicorn api.main:app --reload
 ```
 
-FastAPI documentation available at:
+Open:
 
 ```
 http://localhost:8000/docs
@@ -459,13 +524,13 @@ http://localhost:8000/docs
 
 ----------
 
-4️⃣ Run Streamlit app
+### **4️⃣ Run Streamlit**
 
 ```
 streamlit run app/streamlit_app.py
 ```
 
-Streamlit runs at:
+Open:
 
 ```
 http://localhost:8501
@@ -473,7 +538,7 @@ http://localhost:8501
 
 ----------
 
-🐳 Running with Docker
+# **🐳 Running with Docker**
 
   
 
@@ -483,42 +548,46 @@ Build containers:
 docker compose build
 ```
 
-Start containers:
+Run containers:
 
 ```
 docker compose up
 ```
 
-This will start:
+Services started:
 
-  
+**Service**
 
-• FastAPI service
+**Port**
 
-• Streamlit dashboard
+FastAPI
 
-• SQLite database logging
+8000
+
+Streamlit
+
+8501
+
+MLflow
+
+5001
 
 ----------
 
-🔌 API Endpoint
+# **🔌 API Endpoint**
 
   
 
+### **Predict House Price**
+
+```
 POST /predict
-
-  
-
-Predict house price.
-
-  
+```
 
 Example request:
 
 ```
-curl -X POST "http://localhost:8000/predict" \
--H "Content-Type: application/json" \
--d '{
+{
 "property_type": "D",
 "old_new": "Y",
 "duration": "F",
@@ -526,7 +595,7 @@ curl -X POST "http://localhost:8000/predict" \
 "district": "CAMDEN",
 "county": "GREATER LONDON",
 "year": 2015
-}'
+}
 ```
 
 Example response:
@@ -539,23 +608,22 @@ Example response:
 
 ----------
 
-🗄 Prediction Logging
+# **🗄 Prediction Logging**
 
   
 
 Each prediction is stored in a SQLite database including:
 
-  
-
-• property type
-
-• location details
-
-• transaction year
-
-• predicted price
-
-• timestamp
+-   property type
+    
+-   location details
+    
+-   transaction year
+    
+-   predicted price
+    
+-   timestamp
+    
 
   
 
@@ -563,68 +631,68 @@ This enables tracking of prediction history and usage patterns.
 
 ----------
 
-⚠ Limitations
+# **⚠ Limitations**
 
   
 
 The dataset does not include several important real estate features such as:
 
-  
-
-• number of bedrooms
-
-• property area
-
-• number of bathrooms
-
-• building condition
-
-  
-
-Therefore predictions are based mainly on:
+-   number of bedrooms
+    
+-   property area
+    
+-   number of bathrooms
+    
+-   building condition
+    
 
   
 
-• property type
+Predictions are therefore based mainly on:
 
-• ownership duration
-
-• location
-
-• transaction year
+-   property type
+    
+-   ownership duration
+    
+-   location
+    
+-   transaction year
+    
 
 ----------
 
-🚀 Future Improvements
+# **🚀 Future Improvements**
 
   
 
 Possible improvements include:
 
-  
-
-• Adding additional property features
-
-• Implementing advanced models (XGBoost, LightGBM)
-
-• Adding geospatial location features
-
-• Deploying the system on cloud platforms (AWS / GCP / Azure)
-
-• Adding authentication and analytics dashboard
-
-----------
-
-💼 CV Project Description
-
-Built and deployed a full-stack machine learning system to predict property prices using historical UK Land Registry data. Implemented data preprocessing, feature engineering, and regression model comparison with Scikit-learn. Deployed the model through a FastAPI REST API with a Streamlit interactive dashboard, integrated SQLite database logging, and containerized the application using Docker.
+-   Adding additional property features
+    
+-   Implementing advanced models (XGBoost, LightGBM)
+    
+-   Adding geospatial location features
+    
+-   Deploying system on cloud platforms (AWS / GCP / Azure)
+    
+-   Implementing authentication and user analytics
+    
 
 ----------
 
-📜 License
+# **💼 CV Project Description**
 
   
 
-This project is licensed under the MIT License.
+Built and deployed a full-stack machine learning system to predict property prices using historical UK Land Registry data. Implemented data preprocessing, feature engineering, and regression model comparison with Scikit-learn. Deployed the model through a FastAPI REST API with a Streamlit interactive dashboard, integrated SQLite database logging, tracked experiments using MLflow, and containerized the application using Docker.
 
 ----------
+
+# **📜 License**
+
+  
+
+MIT License
+
+----------
+

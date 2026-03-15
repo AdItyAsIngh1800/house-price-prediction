@@ -17,6 +17,7 @@ __pycache__/
 venv/
 
 models/*.pkl
+.DS_Store
 
 mlruns/
 mlflow.db
