@@ -6,6 +6,8 @@ Machine Learning & Full-Stack Deployment Project
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 
+![MLflow](https://img.shields.io/badge/MLflow-0194E2?style=flat&logo=mlflow&logoColor=white)
+
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
 
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
@@ -66,6 +68,12 @@ The project demonstrates an **end-to-end ML workflow from data preprocessing to 
 ✔ Prediction logging to SQLite database
 
 ✔ Docker containerization for reproducible deployment
+
+✔ Location-based price analysis dashboard  
+
+✔ Model feature importance visualization  
+
+✔ MLflow experiment tracking for model training
 
 ----------
 
@@ -185,9 +193,25 @@ The dataset is published by the  **UK Land Registry**  and contains large-scale 
 
 ----------
 
+## 📍 Location Insights
+
+The Streamlit dashboard includes location-based analytics that allow users to explore regional housing trends.
+
+The dashboard displays:
+
+- Top 10 most expensive towns and cities
+- Top 10 most affordable towns and cities
+- Average house prices by county
+- Average house prices by district
+- Detailed county-level analysis
+
+These insights help users understand regional price variations in the housing market.
+
+---
+
 ## **📊 Model Performance**
 
-  Several regression models were trained and evaluated using MAE, MSE, RMSE, R² Score, and cross-validation.
+Several regression models were trained and evaluated using MAE, MSE, RMSE, R² Score, and cross-validation.
 
 ## 📊 Model Performance Comparison
 
@@ -236,6 +260,16 @@ Because of this, simpler linear relationships performed better than more complex
 
 ----------
 
+## 🔎 Model Interpretability
+
+The dashboard includes a **feature importance visualization** that highlights which variables influence house price predictions.
+
+For tree-based models (Decision Tree, Random Forest, Gradient Boosting), feature importance values are extracted during training and displayed in the Streamlit dashboard.
+
+This improves transparency and helps understand how the model makes predictions.
+
+---
+
 ## **⚙️ Model Optimization**
 
   
@@ -265,21 +299,21 @@ Although tuning improved model stability, Linear Regression still produced the h
 
 Model training experiments are tracked using **MLflow**.
 
-MLflow records:
+MLflow automatically records:
 
 - model parameters
 - evaluation metrics
-- cross-validation scores
+- cross-validation results
 - trained model artifacts
 
-Each training run is stored as an experiment, allowing easy comparison between multiple models such as:
+Each training run is logged as an experiment, allowing easy comparison between models such as:
 
 - Linear Regression
 - Decision Tree
 - Gradient Boosting
 - Random Forest
 
-This makes the training pipeline reproducible and improves experiment management.
+MLflow improves reproducibility and experiment management during model development.
 
 ---
 
@@ -333,11 +367,6 @@ house-price-prediction/
 │   ├── fastapi_docs.png
 │   └── streamlit_ui.png
 ├── api
-│   ├── __pycache__
-│   │   ├── main.cpython-311.pyc
-│   │   ├── main.cpython-314.pyc
-│   │   ├── schemas.cpython-311.pyc
-│   │   └── schemas.cpython-314.pyc
 │   ├── main.py
 │   └── schemas.py
 ├── app
@@ -347,9 +376,6 @@ house-price-prediction/
 │   ├── extract_metadata.ipynb
 │   └── price_paid_records.csv
 ├── database
-│   ├── __pycache__
-│   │   ├── db.cpython-311.pyc
-│   │   └── db.cpython-314.pyc
 │   └── db.py
 ├── docker-compose.yml
 ├── house_predictions.db
@@ -366,9 +392,9 @@ house-price-prediction/
 ├── notebooks
 │   └── house_price_prediction.ipynb
 ├── requirements.txt
+├── mlruns/  
+├── mlflow.db
 └── src
-    ├── __pycache__
-    │   └── data_preprocessing.cpython-314.pyc
     ├── data_preprocessing.py
     ├── predict.py
     └── train_model.py
@@ -406,7 +432,19 @@ pip install -r requirements.txt
 ```
 
 ----------
+### Run MLflow UI
 
+After training models, you can inspect experiment results using MLflow.
+
+Start the MLflow tracking server:
+
+```bash
+mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --port 5000
+```
+Open the MLflow dashboard:
+http://localhost:5000
+
+---
 3️⃣ Start FastAPI server
 
 ```
@@ -578,8 +616,6 @@ Possible improvements include:
 ----------
 
 💼 CV Project Description
-
-  
 
 Built and deployed a full-stack machine learning system to predict property prices using historical UK Land Registry data. Implemented data preprocessing, feature engineering, and regression model comparison with Scikit-learn. Deployed the model through a FastAPI REST API with a Streamlit interactive dashboard, integrated SQLite database logging, and containerized the application using Docker.
 

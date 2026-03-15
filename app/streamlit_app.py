@@ -22,7 +22,6 @@ API_BASE_URL = "http://127.0.0.1:8000"
 # Load dataset for dashboard
 # -----------------------------
 data = pd.read_csv(DATA_DIR / "price_paid_records.csv", nrows=20000)
-
 data["Date of Transfer"] = pd.to_datetime(data["Date of Transfer"])
 data["Year"] = data["Date of Transfer"].dt.year
 
@@ -31,6 +30,12 @@ data["Year"] = data["Date of Transfer"].dt.year
 # -----------------------------
 metrics_path = MODELS_DIR / "model_metrics.csv"
 comparison_df = pd.read_csv(metrics_path) if metrics_path.exists() else pd.DataFrame()
+
+# -----------------------------
+# Load feature importance if available
+# -----------------------------
+importance_path = MODELS_DIR / "feature_importance.csv"
+importance_df = pd.read_csv(importance_path) if importance_path.exists() else pd.DataFrame()
 
 # -----------------------------
 # Friendly display mappings
@@ -71,6 +76,7 @@ st.sidebar.write("""
 - District
 - County
 - Year
+- Location-based engineered features
 """)
 
 st.info(
@@ -232,14 +238,91 @@ st.markdown("### Property Type Distribution")
 st.bar_chart(property_counts)
 
 # -----------------------------
+# Location-Based Price Insights
+# -----------------------------
+st.markdown("## 📍 Location-Based Price Insights")
+
+town_price_df = (
+    data.groupby("Town/City")["Price"]
+    .mean()
+    .reset_index()
+    .sort_values(by="Price", ascending=False)
+)
+
+county_price_df = (
+    data.groupby("County")["Price"]
+    .mean()
+    .reset_index()
+    .sort_values(by="Price", ascending=False)
+)
+
+district_price_df = (
+    data.groupby("District")["Price"]
+    .mean()
+    .reset_index()
+    .sort_values(by="Price", ascending=False)
+)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("### Top 10 Most Expensive Towns/Cities")
+    st.dataframe(town_price_df.head(10), use_container_width=True)
+
+with col2:
+    st.markdown("### Top 10 Most Affordable Towns/Cities")
+    st.dataframe(
+        town_price_df.tail(10).sort_values(by="Price", ascending=True),
+        use_container_width=True
+    )
+
+st.markdown("### Average Price by County")
+st.bar_chart(county_price_df.head(15).set_index("County"))
+
+st.markdown("### Average Price by District")
+st.bar_chart(district_price_df.head(15).set_index("District"))
+
+# -----------------------------
+# County Filter Analysis
+# -----------------------------
+st.markdown("### County-Level Detailed Analysis")
+
+selected_county = st.selectbox(
+    "Select County for Detailed Analysis",
+    options=sorted(data["County"].dropna().astype(str).unique())
+)
+
+county_filtered = data[data["County"] == selected_county]
+
+towns_in_county = (
+    county_filtered.groupby("Town/City")["Price"]
+    .mean()
+    .reset_index()
+    .sort_values(by="Price", ascending=False)
+)
+
+st.dataframe(towns_in_county.head(20), use_container_width=True)
+
+# -----------------------------
 # Model comparison
 # -----------------------------
 st.markdown("## Model Comparison")
 
 if not comparison_df.empty:
-    st.dataframe(comparison_df)
+    st.dataframe(comparison_df, use_container_width=True)
 else:
     st.info("Model comparison metrics not available yet. Run training first.")
+
+# -----------------------------
+# Feature Importance
+# -----------------------------
+st.markdown("## Model Feature Importance")
+
+if not importance_df.empty:
+    top_features = importance_df.head(20)
+    st.bar_chart(top_features.set_index("feature")["importance"])
+else:
+    st.info("Feature importance available only when a tree-based model is deployed and feature importance has been exported.")
 
 # -----------------------------
 # Limitations
@@ -270,4 +353,6 @@ This project demonstrates:
 - Streamlit dashboard development
 - SQLite database logging
 - Docker containerization
+- Location-based analytics
+- Basic model interpretability
 """)
