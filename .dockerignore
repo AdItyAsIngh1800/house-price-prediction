@@ -8,3 +8,6 @@ __pycache__
 venv
 .ipynb_checkpoints
 .env
+mlruns
+mlflow.db
+.DS_Store
