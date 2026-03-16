@@ -1,7 +1,8 @@
 # **🏠 House Price Prediction System**
 
 Machine Learning & Full-Stack Deployment Project
-![Python](https://img.shields.io/badge/Python-3.10-blue)
+
+![ Python](https://img.shields.io/badge/Python-3.10-blue)
 
   
 
